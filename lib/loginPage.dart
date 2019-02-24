@@ -1,7 +1,9 @@
+import 'package:auth/homePage.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class LoginPage extends StatefulWidget {
+
   @override
   _LoginPageState createState() => _LoginPageState();
 }
@@ -14,8 +16,7 @@ enum FormType{
 class _LoginPageState extends State<LoginPage> {
 
   final formKey = new GlobalKey<FormState>();
-  
-
+  BuildContext _ctx;
   String _email;
   String _password;
   FormType _formType = FormType.login;
@@ -33,18 +34,23 @@ class _LoginPageState extends State<LoginPage> {
   void submit() async {
     if (validate()){
      try {
-    if (this._formType ==FormType.login) {
+    if (this._formType == FormType.login) {
          FirebaseUser user = await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: _email,
         password: _password
       );
       print('Signed In ${user.uid}');
+      Navigator.of(_ctx).pushReplacementNamed("/home");
     } else {
       FirebaseUser user = await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: _email,
         password: _password
       );
       print('Register User: ${user.uid}');
+      setState(() {
+       _formType = FormType.login; 
+      });
+      formKey.currentState.reset();
     }
      } catch (err) {
        print('Error $err');
@@ -68,6 +74,7 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    _ctx = context;
     return Scaffold(
       appBar: new AppBar(
         title: new Text('login'),

@@ -1,6 +1,6 @@
-import 'package:auth/homePage.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:modal_progress_hud/modal_progress_hud.dart';
 
 class LoginPage extends StatefulWidget {
 
@@ -12,6 +12,9 @@ enum FormType{
     login,
     register
 }
+
+bool _loading = false;
+
 
 class _LoginPageState extends State<LoginPage> {
 
@@ -35,13 +38,23 @@ class _LoginPageState extends State<LoginPage> {
     if (validate()){
      try {
     if (this._formType == FormType.login) {
+      
+      setState(() {
+       _loading = true; 
+      });
          FirebaseUser user = await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: _email,
         password: _password
       );
       print('Signed In ${user.uid}');
       Navigator.of(_ctx).pushReplacementNamed("/home");
+       setState(() {
+       _loading = false; 
+      });
     } else {
+       setState(() {
+       _loading = true; 
+      });
       FirebaseUser user = await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: _email,
         password: _password
@@ -49,6 +62,7 @@ class _LoginPageState extends State<LoginPage> {
       print('Register User: ${user.uid}');
       setState(() {
        _formType = FormType.login; 
+       _loading = false;
       });
       formKey.currentState.reset();
     }
@@ -72,14 +86,8 @@ class _LoginPageState extends State<LoginPage> {
     });
   }
 
-  @override
-  Widget build(BuildContext context) {
-    _ctx = context;
-    return Scaffold(
-      appBar: new AppBar(
-        title: new Text('login'),
-      ),
-      body: new Container(
+  Widget _buildWidget() {
+    return new Container(
         padding: EdgeInsets.all(10.0),
         child: new Form(
           key: formKey,
@@ -121,7 +129,17 @@ class _LoginPageState extends State<LoginPage> {
             ],
           ),
         ),
+      );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    _ctx = context;
+    return Scaffold(
+      appBar: new AppBar(
+        title: new Text('login'),
       ),
+      body: ModalProgressHUD(child: _buildWidget(), inAsyncCall: _loading),
     );
   }
 

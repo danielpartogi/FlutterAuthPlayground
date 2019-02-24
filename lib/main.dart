@@ -1,4 +1,3 @@
-import 'package:auth/loginPage.dart';
 import 'package:auth/router.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -40,18 +39,5 @@ class SplashScreen extends StatelessWidget {
         Navigator.pushReplacementNamed(context, '/login');
       }
     });
-
-    return new Scaffold(
-      body: new Card(
-        child: new Center(
-          child:
-            new Text('Loading.....',
-              style: new TextStyle(fontSize: 24.00,
-                 fontWeight: FontWeight.bold,
-                 color: Colors.indigo)
-            ),
-          )
-        ),
-    );
   }
 }
